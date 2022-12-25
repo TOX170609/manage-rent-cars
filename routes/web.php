@@ -1,5 +1,7 @@
 <?php
 
+use App\Http\Controllers\RentCarPark\RentCarPark;
+use App\Http\Controllers\TestPage;
 use Illuminate\Support\Facades\Route;
 
 /*
@@ -17,3 +19,13 @@ Route::get('/', function () {
     return view('welcome');
 
 });
+
+Route::get('/setCar', [RentCarPark::class, 'setCar']);
+
+Route::get('/getCar', [RentCarPark::class, 'getInfo']);
+
+Route::get('/getCarPark', [RentCarPark::class, 'list']);
+
+Route::get('/updateCar', [RentCarPark::class, 'updateCar']);
+
+Route::get('/deleteCar', [RentCarPark::class, 'deleteCar']);
