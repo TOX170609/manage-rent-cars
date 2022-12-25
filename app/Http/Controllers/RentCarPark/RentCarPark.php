@@ -4,6 +4,7 @@ namespace App\Http\Controllers\RentCarPark;
 
 use App\Http\Controllers\Controller;
 use App\Models\RentCarPark\RentCarParkStorage;
+use App\Models\User;
 use Illuminate\Http\Request;
 use Illuminate\Database\Eloquent\Collection;
 
@@ -44,9 +45,11 @@ class RentCarPark extends Controller
         if ($request['all'] == 'true') {
             return $this->carPark->list(true, false);
         } else {
-            return $this->carPark->list(false, $request['param_id']);
+            if (empty($this->carPark->list(false, $request['param_id']))) {
+                return $this->carPark->list(false, $request['param_id']);
+            }
+            abort(400, 'По вашему запросу не найдено автомобилей');
         }
-
     }
 
     /**
@@ -57,10 +60,11 @@ class RentCarPark extends Controller
     {
         $request = $this->request->all();
         abort_if(empty($request['id']), 400, 'Обновить данные об автомобиле не удалось. Не передан идентификационный номер');
+        $user = User::all()->where('email', $request['driverEmail'])->first();
         $active = $request['active'] == 'true';
         $renovation = $request['renovation'] == 'true';
         $rented = $request['rented'] == 'true';
-        return $this->carPark->updateCar((integer)$request['id'], $request['color'], $active, $renovation, $rented);
+        return $this->carPark->updateCar((integer)$request['id'], $request['color'], $active, $renovation, $rented, $user['id']);
     }
 
     /**

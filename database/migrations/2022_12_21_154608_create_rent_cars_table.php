@@ -23,6 +23,7 @@ return new class extends Migration
             $table->boolean('active')->nullable();
             $table->boolean('renovation')->nullable();
             $table->boolean('rented')->nullable();
+            $table->integer('driverID')->nullable();
         });
     }
 

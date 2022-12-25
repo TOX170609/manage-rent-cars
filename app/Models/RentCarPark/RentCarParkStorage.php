@@ -55,8 +55,14 @@ class RentCarParkStorage implements RentCarParkInterface
     /**
      * @inheritDoc
      */
-    function updateCar(int $id, string $color, bool $active, bool $renovation, bool $rented): string
+    function updateCar(int $id, string $color, bool $active, bool $renovation, bool $rented, int $driverID): string
     {
+
+        $issetDriver = DB::table('rent_cars')->where('driverID', $driverID);
+
+        if($issetDriver){
+            return 'У данного водителя уже есть арендованный автомобиль';
+        }
 
         DB::table('rent_cars')
             ->where('id', $id)
@@ -65,6 +71,7 @@ class RentCarParkStorage implements RentCarParkInterface
                 'active' => $active,
                 'renovation' => $renovation,
                 'rented' => $rented,
+                'driverID' => $driverID
             ]);
         return 'Обновление данных об автомобиле прошло успешно!';
     }
