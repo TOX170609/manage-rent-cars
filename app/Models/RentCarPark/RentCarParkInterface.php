@@ -41,7 +41,7 @@ interface RentCarParkInterface
      * @param bool $rented
      * @return string
      */
-    function updateCar(int $id, int $carMileage, string $color, bool $active, bool $renovation, bool $rented): string;
+    function updateCar(int $id, string $color, bool $active, bool $renovation, bool $rented): string;
 
     /**
      * Возвращает объект содержащий информацию об автомобиле
