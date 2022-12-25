@@ -2,6 +2,8 @@
 
 namespace App\Models\RentCarPark;
 
+use Illuminate\Database\Eloquent\Collection;
+
 interface RentCarParkInterface
 {
     /**
@@ -18,18 +20,16 @@ interface RentCarParkInterface
      * @param string $color
      * @return string
      */
-//    function setCar(string $brand, int $yearProduce, int $carMileage, string $color): string;
+    function setCar(string $brand, int $yearProduce, int $carMileage, string $color): string;
 
     /**
      * Получение списка автомобилей, с возможностью выборки по состоянию автомобиля
      * (готов к аренде, в ремонте, уже в аренде)
      * @param bool $all
-     * @param bool $active
-     * @param bool $renovation
-     * @param bool $rented
-     * @return array
+     * @param int $param_id
+     * @return Collection
      */
-//    function list(bool $all, bool $active, bool $renovation, bool $rented): array;
+    function list(bool $all, int $param_id): Collection;
 
     /**
      * Возвращает сообщение об успешной или неуспешной операции обновления
@@ -39,9 +39,9 @@ interface RentCarParkInterface
      * @param bool $active
      * @param bool $renovation
      * @param bool $rented
-     * @return bool
+     * @return string
      */
-//    function updateCar(int $id, int $carMileage, string $color, bool $active, bool $renovation, bool $rented): bool;
+    function updateCar(int $id, int $carMileage, string $color, bool $active, bool $renovation, bool $rented): string;
 
     /**
      * Возвращает объект содержащий информацию об автомобиле
@@ -55,7 +55,7 @@ interface RentCarParkInterface
      * @param int $id
      * @return string
      */
-//    function deleteCar(int $id): string;
+    function deleteCar(int $id): string;
 
 
 }

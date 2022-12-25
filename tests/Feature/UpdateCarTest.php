@@ -7,7 +7,7 @@ use Illuminate\Foundation\Testing\WithFaker;
 use Illuminate\Testing\Fluent\AssertableJson;
 use Tests\TestCase;
 
-class listCarsTest extends TestCase
+class UpdateCarTest extends TestCase
 {
     /**
      * A basic feature test example.
@@ -16,8 +16,9 @@ class listCarsTest extends TestCase
      */
     public function test_example()
     {
-        $response = $this->getJson('/getCar');
+        $response = $this->getJson('/updateCar');
 
         $response->assertJson(fn(AssertableJson $json) => $json->etc());
+
     }
 }

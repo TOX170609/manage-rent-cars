@@ -22,6 +22,9 @@ class CarParkSeeder extends Seeder
             'yearProduce' => 2022,
             'carMileage' => 5000,
             'color' => 'black',
+            'active' => true,
+            'renovation' => false,
+            'rented'=> true
         ]);
     }
 }

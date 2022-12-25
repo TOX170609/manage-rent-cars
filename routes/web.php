@@ -19,6 +19,12 @@ Route::get('/', function () {
     return view('welcome');
 });
 
-//Route::get('/test', [TestPage::class, 'getTest']);
+Route::get('/setCar', [RentCarPark::class, 'setCar']);
 
-Route::get('/rentCarPark', [RentCarPark::class, 'getInfo']);
+Route::get('/getCar', [RentCarPark::class, 'getInfo']);
+
+Route::get('/getCarPark', [RentCarPark::class, 'list']);
+
+Route::get('/updateCar', [RentCarPark::class, 'updateCar']);
+
+Route::get('/deleteCar', [RentCarPark::class, 'deleteCar']);
