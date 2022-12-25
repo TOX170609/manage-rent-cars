@@ -55,13 +55,12 @@ class RentCarParkStorage implements RentCarParkInterface
     /**
      * @inheritDoc
      */
-    function updateCar(int $id, int $carMileage, string $color, bool $active, bool $renovation, bool $rented): string
+    function updateCar(int $id, string $color, bool $active, bool $renovation, bool $rented): string
     {
 
         DB::table('rent_cars')
             ->where('id', $id)
             ->update([
-                'carMileage' => $carMileage,
                 'color' => $color,
                 'active' => $active,
                 'renovation' => $renovation,

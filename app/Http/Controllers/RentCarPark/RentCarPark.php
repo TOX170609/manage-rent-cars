@@ -60,7 +60,7 @@ class RentCarPark extends Controller
         $active = $request['active'] == 'true';
         $renovation = $request['renovation'] == 'true';
         $rented = $request['rented'] == 'true';
-        return $this->carPark->updateCar((integer)$request['id'], (integer)$request['yearProduce'], $request['color'], $active, $renovation, $rented);
+        return $this->carPark->updateCar((integer)$request['id'], $request['color'], $active, $renovation, $rented);
     }
 
     /**
