@@ -55,13 +55,13 @@ class RentCarParkStorage implements RentCarParkInterface
     /**
      * @inheritDoc
      */
-    function updateCar(int $id, string $color, bool $active, bool $renovation, bool $rented, int $driverID): string
+    function updateCar(int $id, string $color, bool $active, bool $renovation, bool $rented, ?int $driverID): string
     {
-
-        $issetDriver = DB::table('rent_cars')->where('driverID', $driverID);
-
-        if($issetDriver){
-            return 'У данного водителя уже есть арендованный автомобиль';
+        if (!is_null($driverID)) {
+            $issetDriver = RentCar::all()->where('driverID', $driverID)->first();
+            if (!empty($issetDriver)) {
+                return 'У данного водителя уже есть арендованный автомобиль';
+            }
         }
 
         DB::table('rent_cars')
@@ -81,7 +81,11 @@ class RentCarParkStorage implements RentCarParkInterface
      */
     function getInfo(int $id): object
     {
-        return DB::table('rent_cars')->find($id);
+        $getCar = DB::table('rent_cars')->find($id);
+        if (!is_null($getCar)) {
+            return $getCar;
+        }
+        return response('Автомобиля с таким ID нет, попробуйте другой!', 400);
     }
 
     /**

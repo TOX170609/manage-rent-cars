@@ -34,14 +34,14 @@ interface RentCarParkInterface
     /**
      * Возвращает сообщение об успешной или неуспешной операции обновления
      * @param int $id
-     * @param int $carMileage
      * @param string $color
      * @param bool $active
      * @param bool $renovation
      * @param bool $rented
+     * @param int|null $driverID
      * @return string
      */
-    function updateCar(int $id, string $color, bool $active, bool $renovation, bool $rented, int $driverID): string;
+    function updateCar(int $id, string $color, bool $active, bool $renovation, bool $rented, ?int $driverID): string;
 
     /**
      * Возвращает объект содержащий информацию об автомобиле
