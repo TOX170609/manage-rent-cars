@@ -1,0 +1,492 @@
+{
+    "openapi": "3.0.0",
+    "info": {
+        "title": "Fondarium competency test",
+        "contact": {
+            "email": "admin@example.com"
+        },
+        "license": {
+            "name": "Apache 2.0",
+            "url": "http://www.apache.org/licenses/LICENSE-2.0.html"
+        },
+        "version": "1.0.0"
+    },
+    "servers": [
+        {
+            "url": "http://localhost/api",
+            "description": "Laravel Swagger API server"
+        }
+    ],
+    "paths": {
+        "/registration": {
+            "post": {
+                "tags": [
+                    "Registration and authtarization"
+                ],
+                "summary": "Регистрация нового пользователя",
+                "operationId": "registration",
+                "requestBody": {
+                    "required": false,
+                    "content": {
+                        "application/json": {
+                            "schema": {
+                                "$ref": "#/components/schemas/RegNewUserRequest"
+                            }
+                        }
+                    }
+                },
+                "responses": {
+                    "201": {
+                        "description": "Success",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/RegNewUserRequest"
+                                }
+                            }
+                        }
+                    },
+                    "400": {
+                        "description": "Bad request"
+                    }
+                }
+            }
+        },
+        "/auth": {
+            "post": {
+                "tags": [
+                    "Registration and authtarization"
+                ],
+                "summary": "Авторизация пользователя",
+                "operationId": "authtarization",
+                "requestBody": {
+                    "required": false,
+                    "content": {
+                        "application/json": {
+                            "schema": {
+                                "$ref": "#/components/schemas/AuthUserRequest"
+                            }
+                        }
+                    }
+                },
+                "responses": {
+                    "201": {
+                        "description": "Success",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/AuthUserRequest"
+                                }
+                            }
+                        }
+                    },
+                    "400": {
+                        "description": "Bad request"
+                    }
+                }
+            }
+        },
+        "/logout": {
+            "post": {
+                "tags": [
+                    "Registration and authtarization"
+                ],
+                "summary": "Разлогинивание пользователя",
+                "operationId": "logout",
+                "requestBody": {
+                    "required": false,
+                    "content": {
+                        "application/json": {
+                            "schema": {
+                                "$ref": "#/components/schemas/LogoutRequest"
+                            }
+                        }
+                    }
+                },
+                "responses": {
+                    "200": {
+                        "description": "Success",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/LogoutRequest"
+                                }
+                            }
+                        }
+                    },
+                    "400": {
+                        "description": "Bad request"
+                    }
+                },
+                "security": [
+                    {
+                        "userToken": []
+                    }
+                ]
+            }
+        },
+        "/setCar": {
+            "post": {
+                "tags": [
+                    "RentCarPark"
+                ],
+                "summary": "Создает новый автомобиль",
+                "operationId": "rentCarCreate",
+                "requestBody": {
+                    "required": false,
+                    "content": {
+                        "application/json": {
+                            "schema": {
+                                "$ref": "#/components/schemas/CreateRentCarRequest"
+                            }
+                        }
+                    }
+                },
+                "responses": {
+                    "201": {
+                        "description": "Success",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/CreateRentCarRequest"
+                                }
+                            }
+                        }
+                    },
+                    "400": {
+                        "description": "Bad request"
+                    }
+                },
+                "security": [
+                    {
+                        "administratorKey": []
+                    }
+                ]
+            }
+        },
+        "/getCar": {
+            "get": {
+                "tags": [
+                    "RentCarPark"
+                ],
+                "summary": "Возвращает информацию о машине",
+                "operationId": "getCar",
+                "parameters": [
+                    {
+                        "name": "id",
+                        "in": "query",
+                        "description": "id автомобиля",
+                        "required": true,
+                        "schema": {
+                            "type": "integer"
+                        },
+                        "example": "1"
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Запрос обработан успешно"
+                    },
+                    "400": {
+                        "description": "Переданы неверные данные"
+                    }
+                }
+            }
+        },
+        "/getCarPark": {
+            "get": {
+                "tags": [
+                    "RentCarPark"
+                ],
+                "summary": "Возвращает информацию о машинах",
+                "operationId": "getCarPark",
+                "parameters": [
+                    {
+                        "name": "all",
+                        "in": "query",
+                        "description": "\n    true - если вывести все машины\n    false - если вывести по параметрам отбора\n    ",
+                        "required": true,
+                        "schema": {
+                            "type": "string"
+                        },
+                        "example": "true"
+                    },
+                    {
+                        "name": "param_id",
+                        "in": "query",
+                        "description": "\n    1 - только активные машины\n    2 - только машины находящиеся в ремонте\n    3 - только арендованные машины\n    ",
+                        "required": true,
+                        "schema": {
+                            "type": "integer"
+                        },
+                        "example": "1"
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Запрос обработан успешно"
+                    },
+                    "400": {
+                        "description": "Переданы неверные данные"
+                    }
+                }
+            }
+        },
+        "/updateCar": {
+            "put": {
+                "tags": [
+                    "RentCarPark"
+                ],
+                "summary": "Обновляет данные об автомобиле",
+                "operationId": "rentCarUpdate",
+                "requestBody": {
+                    "required": false,
+                    "content": {
+                        "application/json": {
+                            "schema": {
+                                "$ref": "#/components/schemas/UpdateRentCarRequest"
+                            }
+                        }
+                    }
+                },
+                "responses": {
+                    "200": {
+                        "description": "Обновление данных прошло успешно",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/UpdateRentCarRequest"
+                                }
+                            }
+                        }
+                    },
+                    "400": {
+                        "description": "Переданы неверные данные"
+                    }
+                },
+                "security": [
+                    {
+                        "administratorKey": []
+                    }
+                ]
+            }
+        },
+        "/deleteCar": {
+            "post": {
+                "tags": [
+                    "RentCarPark"
+                ],
+                "summary": "Удаление автомобиля из базы",
+                "operationId": "deleteCar",
+                "requestBody": {
+                    "required": true,
+                    "content": {
+                        "application/json": {
+                            "schema": {
+                                "$ref": "#/components/schemas/DeleteCarRequest"
+                            }
+                        }
+                    }
+                },
+                "responses": {
+                    "200": {
+                        "description": "Удаление автомобиля из базы прошло успешно"
+                    },
+                    "400": {
+                        "description": "Удаление автомобиля из базы прошло не успешно"
+                    }
+                },
+                "security": [
+                    {
+                        "administratorKey": []
+                    }
+                ]
+            }
+        }
+    },
+    "components": {
+        "schemas": {
+            "AuthUserRequest": {
+                "title": "Авторизация",
+                "description": "Авторизация пользователя",
+                "properties": {
+                    "email": {
+                        "title": "Email",
+                        "description": "User's email",
+                        "type": "string",
+                        "format": "string",
+                        "example": "Test@mail.ru"
+                    },
+                    "password": {
+                        "title": "Password",
+                        "description": "Account's password",
+                        "type": "string",
+                        "format": "string"
+                    }
+                },
+                "type": "object"
+            },
+            "CreateRentCarRequest": {
+                "title": "Добавление нового автомобиля",
+                "description": "Запрос создающий новый автомобиль в базе данных парка",
+                "properties": {
+                    "brand": {
+                        "title": "Brand",
+                        "description": "Machine brand",
+                        "type": "string",
+                        "format": "string",
+                        "example": "Volvo"
+                    },
+                    "yearProduce": {
+                        "title": "Production year",
+                        "description": "Production year",
+                        "type": "integer",
+                        "format": "int64",
+                        "example": "2022"
+                    },
+                    "carMileage": {
+                        "title": "Car mileage",
+                        "description": "Car mileage",
+                        "type": "integer",
+                        "format": "int64",
+                        "example": "19000"
+                    },
+                    "color": {
+                        "title": "Color",
+                        "description": "Car`s color",
+                        "type": "string",
+                        "format": "string",
+                        "example": "yellow"
+                    }
+                },
+                "type": "object"
+            },
+            "DeleteCarRequest": {
+                "title": "Удаление автомобиля из базы",
+                "description": "Удаление автомобиля из базы по id машины",
+                "properties": {
+                    "id": {
+                        "title": "id",
+                        "description": "id car",
+                        "type": "integer",
+                        "format": "int64",
+                        "example": "1"
+                    }
+                },
+                "type": "object"
+            },
+            "LogoutRequest": {
+                "title": "Разлогинивание",
+                "description": "Выход из аккаунта",
+                "properties": {
+                    "email": {
+                        "title": "email",
+                        "description": "user's email",
+                        "type": "string",
+                        "format": "string",
+                        "example": "Test@mail.ru"
+                    }
+                },
+                "type": "object"
+            },
+            "RegNewUserRequest": {
+                "title": "Регистрация",
+                "description": "Создание нового аккаунта в системе",
+                "properties": {
+                    "name": {
+                        "title": "Name",
+                        "description": "User's name",
+                        "type": "string",
+                        "format": "string",
+                        "example": "Петр"
+                    },
+                    "email": {
+                        "title": "Email",
+                        "description": "User's email",
+                        "type": "string",
+                        "format": "string",
+                        "example": "Test@mail.ru"
+                    },
+                    "password": {
+                        "title": "Password",
+                        "description": "Account's password",
+                        "type": "string",
+                        "format": "string"
+                    }
+                },
+                "type": "object"
+            },
+            "UpdateRentCarRequest": {
+                "title": "Обновление информации",
+                "description": "Запрос обновляющий данные об автомобиле в том числе если машина сдается в аренду",
+                "properties": {
+                    "id": {
+                        "title": "id",
+                        "description": "id car",
+                        "type": "integer",
+                        "format": "int64",
+                        "example": "1"
+                    },
+                    "color": {
+                        "title": "color",
+                        "description": "color of car",
+                        "type": "string",
+                        "format": "string",
+                        "example": "grey"
+                    },
+                    "active": {
+                        "title": "Active",
+                        "description": "All cars wich available to rent",
+                        "type": "string",
+                        "format": "string",
+                        "example": "true"
+                    },
+                    "renovation": {
+                        "title": "Renovation",
+                        "description": "All cars wich have been repairing",
+                        "type": "string",
+                        "format": "string",
+                        "example": "false"
+                    },
+                    "rented": {
+                        "title": "Rented",
+                        "description": "All cars wich rented",
+                        "type": "string",
+                        "format": "string",
+                        "example": "true"
+                    },
+                    "driverEmail": {
+                        "title": "DriverEmail",
+                        "description": "Account driver wich rented car or false",
+                        "type": "string",
+                        "format": "string",
+                        "example": "false"
+                    }
+                },
+                "type": "object"
+            }
+        },
+        "securitySchemes": {
+            "administratorKey": {
+                "type": "apiKey",
+                "name": "administratorKey",
+                "in": "header"
+            },
+            "userToken": {
+                "type": "apiKey",
+                "name": "userToken",
+                "in": "header"
+            }
+        }
+    },
+    "tags": [
+        {
+            "name": "Registration and authtarization",
+            "description": "Запросы управляющие пользователями сервиса"
+        },
+        {
+            "name": "RentCarPark",
+            "description": "Запросы управляющие автомобилями"
+        }
+    ]
+}

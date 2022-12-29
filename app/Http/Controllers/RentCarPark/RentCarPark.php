@@ -6,8 +6,10 @@ use App\Http\Controllers\Controller;
 use App\Models\RentCarPark\RentCar;
 use App\Models\RentCarPark\RentCarParkStorage;
 use App\Models\User;
+use Illuminate\Foundation\Application;
 use Illuminate\Http\Request;
 use Illuminate\Database\Eloquent\Collection;
+use Illuminate\Http\Response;
 use Illuminate\Support\Facades\DB;
 
 class RentCarPark extends Controller
@@ -25,47 +27,178 @@ class RentCarPark extends Controller
     }
 
     /**
+     * @OA\Post(
+     *     path="/setCar",
+     *     operationId="rentCarCreate",
+     *     tags={"RentCarPark"},
+     *     summary="Создает новый автомобиль",
+     *     security={
+     *       {"administratorKey": {}},
+     *     },
+     *    @OA\Response(
+     *         response="201",
+     *         description="Success",
+     *         @OA\JsonContent(ref="#/components/schemas/CreateRentCarRequest")
+     *     ),
+     *     @OA\Response(
+     *         response="400",
+     *         description="Bad request",
+     *     ),
+     *      @OA\RequestBody(
+     *         required=false,
+     *         @OA\JsonContent(ref="#/components/schemas/CreateRentCarRequest")
+     *     )
+     * )
      * Добавление нового автомобиля в базу данных
-     * @return string
+     * @return object
      */
-    public function setCar(): string
+    public function setCar(Request $request): object
     {
-        $request = $this->request->all();
-        abort_if(empty($request['brand']), 400, 'Не удалось добавить новый автомобиль - не была передана модель машины!');
+        $apiKey = $this->request->server->all();
+
+        if(!array_key_exists('HTTP_ADMINISTRATORKEY', $apiKey) || $apiKey['HTTP_ADMINISTRATORKEY'] != 'admin'){
+            return response('Вы не являетесь администратором, авторизуйтесь', 401);
+        }
+
+        if(empty($request['brand'])) {
+            return response('Не передана марка автомобиля', 400);
+        }
         return $this->carPark->setCar($request['brand'], (integer)$request['yearProduce'], (integer)$request['carMileage'], $request['color']);
     }
 
+
     /**
+     * @OA\Get(
+     *     path="/getCar",
+     *     operationId="getCar",
+     *     tags={"RentCarPark"},
+     *     summary="Возвращает информацию о машине",
+     *     @OA\Parameter(
+     *         name="id",
+     *         in="query",
+     *         description="id автомобиля",
+     *         required=true,
+     *         example="1",
+     *         @OA\Schema(
+     *             type="integer",
+     *         ),
+     *     ),
+     *     @OA\Response(
+     *         response="200",
+     *         description="Запрос обработан успешно",
+     *     ),
+     *      @OA\Response(
+     *         response="400",
+     *         description="Переданы неверные данные",
+     *     ),
+     * )
+     *
+     * Возвращает информацию о машине
+     * @return object
+     */
+    public function getInfo(Request $request): object
+    {
+        return $this->carPark->getInfo((integer)$request['id']);
+    }
+
+
+    /**
+     * @OA\Get(
+     *     path="/getCarPark",
+     *     operationId="getCarPark",
+     *     tags={"RentCarPark"},
+     *     summary="Возвращает информацию о машинах",
+     *     @OA\Parameter(
+     *         name="all",
+     *         in="query",
+     *         description="
+    true - если вывести все машины
+    false - если вывести по параметрам отбора
+    ",
+     *         required=true,
+     *         example="true",
+     *         @OA\Schema(
+     *             type="string",
+     *         ),
+     *     ),
+     *      @OA\Parameter(
+     *         name="param_id",
+     *         in="query",
+     *         description="
+    1 - только активные машины
+    2 - только машины находящиеся в ремонте
+    3 - только арендованные машины
+    ",
+     *         required=true,
+     *         example="1",
+     *         @OA\Schema(
+     *             type="integer",
+     *         ),
+     *     ),
+     *     @OA\Response(
+     *         response="200",
+     *         description="Запрос обработан успешно",
+     *     ),
+     *      @OA\Response(
+     *         response="400",
+     *         description="Переданы неверные данные",
+     *     ),
+     * )
      * Получение списка автомобилей, с возможностью выборки по состоянию автомобиля
      * (готов к аренде, в ремонте, уже в аренде)
-     * @return Collection
+     * @return object
      */
-    public function list(): Collection
+    public function list(Request $request): object
     {
-        $request = $this->request->all();
-        abort_if(empty($request['all']) || empty($request['param_id']), 400, 'Не удалось получить список автомобилей');
         if ($request['all'] == 'true') {
             return $this->carPark->list(true, false);
         } else {
-            if (!empty($this->carPark->list(false, $request['param_id']))) {
-                return $this->carPark->list(false, $request['param_id']);
+            $result = $this->carPark->list(false, $request['param_id']);
+            if (!$result->isEmpty()) {
+                return (object)$result;
+            } else {
+                return response('По вашему запросу не найдено автомобилей', 404);
             }
-            abort(400, 'По вашему запросу не найдено автомобилей');
         }
     }
 
-    /**
-     * Обновление данных об автомобиле
-     * @return string
-     */
-    public function updateCar(): string
-    {
-        $request = $this->request->all();
-        abort_if(empty($request['id']), 400, 'Обновить данные об автомобиле не удалось. Не передан идентификационный номер');
 
-        $user = User::all()->where('email', $request['driverEmail'])->first();
+    /**
+     * @OA\Put(
+     *     path="/updateCar",
+     *     operationId="rentCarUpdate",
+     *     tags={"RentCarPark"},
+     *     summary="Обновляет данные об автомобиле",
+     *     security={
+     *       {"administratorKey": {}},
+     *     },
+     *    @OA\Response(
+     *         response="200",
+     *         description="Обновление данных прошло успешно",
+     *         @OA\JsonContent(ref="#/components/schemas/UpdateRentCarRequest")
+     *     ),
+     *     @OA\Response(
+     *         response="400",
+     *         description="Переданы неверные данные",
+     *     ),
+     *      @OA\RequestBody(
+     *         required=false,
+     *         @OA\JsonContent(ref="#/components/schemas/UpdateRentCarRequest")
+     *     )
+     * )
+     * Обновление данных об автомобиле
+     * @return object
+     */
+    public function updateCar(Request $request): object
+    {
+        $apiKey = $this->request->server->all();
+        if(!array_key_exists('HTTP_ADMINISTRATORKEY', $apiKey) || $apiKey['HTTP_ADMINISTRATORKEY'] != 'admin'){
+            return response('Вы не являетесь администратором, авторизуйтесь', 401);
+        }
+
+        $user = $request['driverEmail'] == 'false' ? true : $this->carPark->getUserId($request['driverEmail']);
         if (!$user && $request['driverEmail'] != 'false') {
-            abort(400, 'Указан неверный email водителя');
+            return response('Указан неверный email водителя', 400);
         }
 
         $driverID = $request['driverEmail'] == 'false' ? null : $user['id'];
@@ -74,27 +207,44 @@ class RentCarPark extends Controller
         $rented = $request['rented'] == 'true';
 
         return $this->carPark->updateCar((integer)$request['id'], $request['color'], $active, $renovation, $rented, $driverID);
+
     }
 
+
     /**
-     * Возвращает информацию о машине
+     * @OA\Post(
+     *     path="/deleteCar",
+     *     operationId="deleteCar",
+     *     tags={"RentCarPark"},
+     *     summary="Удаление автомобиля из базы",
+     *      security={
+     *       {"administratorKey": {}},
+     *     },
+     *     @OA\Response(
+     *         response="200",
+     *         description="Удаление автомобиля из базы прошло успешно",
+     *     ),
+     *     @OA\Response(
+     *         response="400",
+     *         description="Удаление автомобиля из базы прошло не успешно",
+     *     ),
+     *      @OA\RequestBody(
+     *         required=true,
+     *         @OA\JsonContent(ref="#/components/schemas/DeleteCarRequest")
+     *     )
+     * )
+     *
+     * Удаление машины из базы данных
      * @return object
      */
-    public function getInfo(): object
+    public function deleteCar(Request $request): object
     {
-        $request = $this->request;
-        abort_if((integer)$request['id'] == 0, 400, 'Не передан идентификационный номер автомобиля');
-        return $this->carPark->getInfo((integer)$request['id']);
-    }
+        $apiKey = $this->request->server->all();
+        if(!array_key_exists('HTTP_ADMINISTRATORKEY', $apiKey) || $apiKey['HTTP_ADMINISTRATORKEY'] != 'admin'){
+            return response('Вы не являетесь администратором, авторизуйтесь', 401);
+        }
 
-    /**
-     * Удаление машины из базы данных
-     * @return string
-     */
-    public function deleteCar(): string
-    {
-        $request = $this->request->all();
-        abort_if((integer)$request['id'] == 0, 400, 'Не передан идентификационный номер автомобиля');
         return $this->carPark->deleteCar((integer)$request['id']);
+
     }
 }

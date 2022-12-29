@@ -8,9 +8,9 @@ interface RentCarParkInterface
 {
     /**
      * Возвращает уникальный идентификатор пользователя
-     * @return int
+     * @return object
      */
-//    function getUserId(): int;
+    function getUserId(string $email): object;
 
     /**
      * Занесение автомобиля в базу данных, возвращает сообщение об успешной или неуспешной операции добавления
@@ -18,9 +18,9 @@ interface RentCarParkInterface
      * @param int $yearProduce
      * @param int $carMileage
      * @param string $color
-     * @return string
+     * @return object
      */
-    function setCar(string $brand, int $yearProduce, int $carMileage, string $color): string;
+    function setCar(string $brand, int $yearProduce, int $carMileage, string $color): object;
 
     /**
      * Получение списка автомобилей, с возможностью выборки по состоянию автомобиля
@@ -39,9 +39,9 @@ interface RentCarParkInterface
      * @param bool $renovation
      * @param bool $rented
      * @param int|null $driverID
-     * @return string
+     * @return object
      */
-    function updateCar(int $id, string $color, bool $active, bool $renovation, bool $rented, ?int $driverID): string;
+    function updateCar(int $id, string $color, bool $active, bool $renovation, bool $rented, ?int $driverID): object;
 
     /**
      * Возвращает объект содержащий информацию об автомобиле
@@ -53,9 +53,8 @@ interface RentCarParkInterface
     /**
      * Удаляет автомобиль из базы
      * @param int $id
-     * @return string
+     * @return object
      */
-    function deleteCar(int $id): string;
-
+    function deleteCar(int $id): object;
 
 }
