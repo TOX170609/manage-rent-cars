@@ -2,6 +2,7 @@
 
 namespace App\Models\RentCarPark;
 
+use App\Models\User;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Database\Eloquent\Collection;
 
@@ -11,15 +12,15 @@ class RentCarParkStorage implements RentCarParkInterface
     /**
      * @inheritDoc
      */
-//    function getUserId(): int
-//    {
-//        // TODO: Implement getUserId() method.
-//    }
+    function getUserId($email): object
+    {
+        return User::all()->where('email', $email)->first();
+    }
 
     /**
      * @inheritDoc
      */
-    function setCar(string $brand, int $yearProduce, int $carMileage, string $color): string
+    function setCar(string $brand, int $yearProduce, int $carMileage, string $color): object
     {
         $rentCar = new RentCar();
         $rentCar->brand = $brand;
@@ -30,9 +31,9 @@ class RentCarParkStorage implements RentCarParkInterface
         $rentCar->renovation = false;
         $rentCar->rented = false;
         if ($rentCar->save()) {
-            return 'Сохранение прошло успешно';
+            return response('Сохранение прошло успешно', 201);
         }
-        return 'Не удалось добавить новый автомобиль';
+        return response('Не удалось добавить новый автомобиль', 400);
 
     }
 
@@ -46,7 +47,7 @@ class RentCarParkStorage implements RentCarParkInterface
         } else {
             return match ($param_id) {
                 1 => RentCar::all()->where('active', true),
-                2 => RentCar::all()->where('renovation', true),
+                2 => RentCar::all()->where('renovation',true),
                 3 => RentCar::all()->where('rented', true),
             };
         }
@@ -55,16 +56,15 @@ class RentCarParkStorage implements RentCarParkInterface
     /**
      * @inheritDoc
      */
-    function updateCar(int $id, string $color, bool $active, bool $renovation, bool $rented, ?int $driverID): string
+    function updateCar(int $id, string $color, bool $active, bool $renovation, bool $rented, ?int $driverID): object
     {
         if (!is_null($driverID)) {
             $issetDriver = RentCar::all()->where('driverID', $driverID)->first();
             if (!empty($issetDriver)) {
-                return 'У данного водителя уже есть арендованный автомобиль';
+                return response('У данного водителя уже есть арендованный автомобиль', 400);
             }
         }
-
-        DB::table('rent_cars')
+        $update = DB::table('rent_cars')
             ->where('id', $id)
             ->update([
                 'color' => $color,
@@ -73,7 +73,11 @@ class RentCarParkStorage implements RentCarParkInterface
                 'rented' => $rented,
                 'driverID' => $driverID
             ]);
-        return 'Обновление данных об автомобиле прошло успешно!';
+
+        if (!$update) {
+            return response('Не верно указан id автомобиля', 400);
+        }
+        return response('Обновление данных об автомобиле прошло успешно!', 200);
     }
 
     /**
@@ -85,19 +89,26 @@ class RentCarParkStorage implements RentCarParkInterface
         if (!is_null($getCar)) {
             return $getCar;
         }
-        return response('Автомобиля с таким ID нет, попробуйте другой!', 400);
+        return response('Автомобиля с таким ID нет, попробуйте другой!', 404);
     }
 
     /**
      * @inheritDoc
      */
-    function deleteCar(int $id): string
+    function deleteCar(int $id): object
     {
-        $deleted = DB::table('rent_cars')->where('id', '=', $id)->delete();
+
+        $carInfo = RentCar::all()->where('id', $id)->where('rented', true)->first();
+
+        if($carInfo){
+            return response('Удаление невозможно, так как автомобиль находиться в аренде', 400);
+        }
+
+        $deleted = DB::table('rent_cars')->where('id', $id)->delete();
 
         if ($deleted) {
-            return 'Удаление прошло успешно';
+            return response('Удаление прошло успешно', 200);
         }
-        return 'Удаление прошло не успешно';
+        return response('Удаление прошло не успешно', 400);
     }
 }

@@ -17,13 +17,4 @@ use Illuminate\Support\Facades\Route;
 
 Route::get('/', function () {
     return view('welcome');
-
 });
-
-Route::get('/setCar', [RentCarPark::class, 'setCar']);
-
-Route::get('/getCar', [RentCarPark::class, 'getInfo']);
-
-Route::get('/getCarPark', [RentCarPark::class, 'list']);
-
-Route::get('/deleteCar', [RentCarPark::class, 'deleteCar']);
